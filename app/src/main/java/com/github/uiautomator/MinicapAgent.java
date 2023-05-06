@@ -75,13 +75,13 @@ public class MinicapAgent extends Thread {
                 OutputStream output = socket.getOutputStream();
                 rotation = windowManager.getRotation();
                 Point size = windowManager.getDisplaySize();
-                System.out.println("Display: " + size.x + "x" + size.y);
-                System.out.println("Rotation: " + rotation);
+                Log.d(TAG, "Display: " + size.x + "x" + size.y);
+                Log.d(TAG,"Rotation: " + rotation);
                 try {
                     writeBanner(output);
                     pipeImages(output);
                 } catch (Exception e) {
-                    System.out.println("socket closed, exception: " + e);
+                    Log.d(TAG, "socket closed, exception: " + e);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
