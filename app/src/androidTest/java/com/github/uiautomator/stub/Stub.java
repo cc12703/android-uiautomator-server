@@ -23,12 +23,14 @@
 
 package com.github.uiautomator.stub;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.RemoteException;
 import androidx.test.InstrumentationRegistry;
 import androidx.test.filters.LargeTest;
 import androidx.test.filters.SdkSuppress;
+import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.AndroidJUnit4;
 import androidx.test.uiautomator.By;
 import androidx.test.uiautomator.Configurator;
@@ -43,6 +45,7 @@ import com.googlecode.jsonrpc4j.JsonRpcServer;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -67,6 +70,9 @@ public class Stub {
     int PORT = 9008;
     AutomatorHttpServer server = new AutomatorHttpServer(PORT);
 
+
+
+
     @Before
     public void setUp() throws Exception {
         launchService();
@@ -75,6 +81,7 @@ public class Stub {
         jrs.setErrorResolver(new ErrorResolver() {
             @Override
             public JsonError resolveError(Throwable throwable, Method method, List<JsonNode> list) {
+                Log.e("jsonrpc error", throwable);
                 String data = throwable.getMessage();
                 if (!throwable.getClass().equals(UiObjectNotFoundException.class)) {
                     throwable.printStackTrace();
@@ -90,7 +97,7 @@ public class Stub {
     }
 
     private void launchPackage(String packageName) {
-        Log.i(TAG, "Launch " + packageName);
+        Log.i("Launch " + packageName);
         UiDevice device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation());
         Context context = InstrumentationRegistry.getContext();
         final Intent intent = context.getPackageManager()
@@ -111,7 +118,7 @@ public class Stub {
         String launcherPackage = device.getLauncherPackageName();
         Boolean ready = device.wait(Until.hasObject(By.pkg(launcherPackage).depth(0)), LAUNCH_TIMEOUT);
         if (!ready) {
-            Log.i(TAG, "Wait for launcher timeout");
+            Log.i("Wait for launcher timeout");
             return;
         }
 

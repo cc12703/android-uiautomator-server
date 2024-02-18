@@ -47,6 +47,8 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import androidx.test.uiautomator.UiScrollable;
 import androidx.test.uiautomator.UiSelector;
 import androidx.test.uiautomator.Until;
+
+import android.telephony.SubscriptionManager;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
@@ -60,11 +62,15 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Base64;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 
 public class AutomatorServiceImpl implements AutomatorService {
@@ -114,6 +120,39 @@ public class AutomatorServiceImpl implements AutomatorService {
 
     private UiAutomation getUiAutomation() {
         return uiAutomation;
+    }
+
+
+    @Override
+    public boolean chkUrlByCellular(String[] urls) {
+        Context ctx = InstrumentationRegistry.getTargetContext();
+        android.net.Network network = Helper.reqNetByCellular(ctx);
+        OkHttpClient hClient = new OkHttpClient.Builder().socketFactory(network.getSocketFactory()).build();
+        for(String url : urls) {
+            okhttp3.Request reqNet = new Request.Builder().url(url).build();
+            try {
+                boolean isSuccessful = hClient.newCall(reqNet).execute().isSuccessful();
+                if(isSuccessful) {
+                    return true;
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public SimcardInfo[] getSimcardInfo() {
+        Context ctx = InstrumentationRegistry.getTargetContext();
+        SubscriptionManager mgr = (SubscriptionManager) ctx.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+        List<android.telephony.SubscriptionInfo> subInfos = mgr.getActiveSubscriptionInfoList();
+        SimcardInfo[] ret = new SimcardInfo[subInfos.size()];
+        for(int i = 0; i < subInfos.size(); i++) {
+            android.telephony.SubscriptionInfo subInfo = subInfos.get(i);
+            ret[i] = new SimcardInfo(subInfo.getSubscriptionId(), subInfo.getSimSlotIndex());
+        }
+        return ret;
     }
 
     /**

@@ -29,6 +29,8 @@ import androidx.test.uiautomator.UiObjectNotFoundException;
 import com.googlecode.jsonrpc4j.JsonRpcError;
 import com.googlecode.jsonrpc4j.JsonRpcErrors;
 
+import java.util.List;
+
 public interface AutomatorService {
     final static int ERROR_CODE_BASE = -32000;
 
@@ -37,6 +39,16 @@ public interface AutomatorService {
      * boolean hasWatchedOnWindowsChange();
      * void runWatchersOnWindowsChange(boolean enabled); # Auto click permission popups, This will slow uiautomator speed
      */
+
+    /**
+     * check url is opened by cellular network
+     * @param urls
+     * @return
+     */
+    boolean chkUrlByCellular(String[] urls);
+
+
+    SimcardInfo[] getSimcardInfo();
 
 
     /**
