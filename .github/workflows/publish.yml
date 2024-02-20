@@ -14,6 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+            fetch-depth: 0
       - uses: gradle/gradle-build-action@v3
       - run: ./gradlew assembleDebug --stacktrace && ./gradlew packageDebugAndroidTest --stacktrace
       - run: mv app/build/outputs/apk/debug/app-debug.apk app-uiautomator.apk
