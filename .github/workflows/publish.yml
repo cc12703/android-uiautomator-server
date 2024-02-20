@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: gradle/gradle-build-action@v3
-      - run: ./gradlew assembleDebug && ./gradlew packageDebugAndroidTest
+      - run: ./gradlew assembleDebug --stacktrace && ./gradlew packageDebugAndroidTest --stacktrace
       - run: mv app/build/outputs/apk/debug/app-debug.apk app-uiautomator.apk
       - run: mv app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk app-uiautomator-test.apk
       - uses: ncipollo/release-action@v1
