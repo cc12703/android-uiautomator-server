@@ -127,6 +127,10 @@ public class AutomatorServiceImpl implements AutomatorService {
     public boolean chkUrlByCellular(String[] urls) {
         Context ctx = InstrumentationRegistry.getTargetContext();
         android.net.Network network = Helper.reqNetByCellular(ctx);
+        if (network == null) {
+            return false;
+        }
+
         OkHttpClient hClient = new OkHttpClient.Builder().socketFactory(network.getSocketFactory()).build();
         for(String url : urls) {
             okhttp3.Request reqNet = new Request.Builder().url(url).build();
