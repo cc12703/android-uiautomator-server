@@ -60,6 +60,7 @@ import com.github.uiautomator.stub.watcher.PressKeysWatcher;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
@@ -136,9 +137,12 @@ public class AutomatorServiceImpl implements AutomatorService {
             okhttp3.Request reqNet = new Request.Builder().url(url).build();
             try {
                 boolean isSuccessful = hClient.newCall(reqNet).execute().isSuccessful();
-                if(isSuccessful) {
+                if (isSuccessful) {
                     return true;
                 }
+            } catch (ConnectException e) {
+                // ignore
+                Log.d("chkUrlByCellular got ConnectException: " + url);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
