@@ -87,23 +87,34 @@ public class AutomatorHttpServer extends NanoHTTPD {
                 return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
             }
         } else if (router.containsKey(uri)) {
+            long beginTime = System.currentTimeMillis();
             JsonRpcServer jsonRpcServer = router.get(uri);
             ByteArrayInputStream is = null;
             if (params.get("NanoHttpd.QUERY_STRING") != null)
                 is = new ByteArrayInputStream(params.get("NanoHttpd.QUERY_STRING").getBytes());
             else if (files.get("postData") != null)
                 is = new ByteArrayInputStream(files.get("postData").getBytes());
-            else
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Invalid http post data!");
+            else {
+               Response resp = newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Invalid http post data!");
+               return addTimeHeader(resp, beginTime);
+            }
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             try {
                 jsonRpcServer.handleRequest(is, os);
-                return newFixedLengthResponse(Response.Status.OK, "application/json", new ByteArrayInputStream(os.toByteArray()), os.size());
+                Response resp = newFixedLengthResponse(Response.Status.OK, "application/json", new ByteArrayInputStream(os.toByteArray()), os.size());
+                return addTimeHeader(resp, beginTime);
             } catch (IOException e) {
-                return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
+                Response resp = newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Internal Server Error!!!");
+                return addTimeHeader(resp, beginTime);
             }
         } else
             return newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not Found!!!");
+    }
+
+    private Response addTimeHeader(Response resp, long beginTime) {
+        long endTime = System.currentTimeMillis();
+        resp.addHeader("X-Process-TimeMS", String.valueOf(endTime - beginTime));
+        return resp;
     }
 
 }
