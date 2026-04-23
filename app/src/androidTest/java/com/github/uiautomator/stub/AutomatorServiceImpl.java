@@ -146,6 +146,8 @@ public class AutomatorServiceImpl implements AutomatorService {
                 Log.d("chkUrlByCellular got SocketException: " + url);
             } catch (SocketTimeoutException e) {
                 Log.d("chkUrlByCellular got SocketTimeoutException: " + url);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
         return false;
