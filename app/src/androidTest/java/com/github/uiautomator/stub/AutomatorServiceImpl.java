@@ -61,6 +61,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.List;
@@ -140,11 +142,10 @@ public class AutomatorServiceImpl implements AutomatorService {
                 if (isSuccessful) {
                     return true;
                 }
-            } catch (ConnectException e) {
-                // ignore
-                Log.d("chkUrlByCellular got ConnectException: " + url);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            } catch (SocketException e) {
+                Log.d("chkUrlByCellular got SocketException: " + url);
+            } catch (SocketTimeoutException e) {
+                Log.d("chkUrlByCellular got SocketTimeoutException: " + url);
             }
         }
         return false;
